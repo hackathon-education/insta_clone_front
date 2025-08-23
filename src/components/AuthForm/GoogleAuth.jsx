@@ -1,15 +1,14 @@
-import React from 'react'
-import { Flex,Image,Text } from '@chakra-ui/react'
+import React from "react";
+import { Flex, Image, Text } from "@chakra-ui/react";
+import "./AuthForm.css";
 
 function GoogleAuth() {
   return (
-    <Flex justifyContent={'center'} alignItems={'center'}>
-    <Image src='/google.png' w={5}/>
-    <Text mx={4} color={'blue'}>
-      Login with Google
-    </Text>
-  </Flex>
-  )
+    <Flex className="google-auth-container">
+      <Image src="/google.png" className="google-auth-icon" />
+      <Text className="google-auth-text">Login with Google</Text>
+    </Flex>
+  );
 }
 
-export default GoogleAuth
+export default GoogleAuth;
