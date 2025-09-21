@@ -1,24 +1,24 @@
-import React from 'react'
-import {Box, Container,Flex,Image, VStack} from '@chakra-ui/react';
-import AuthForm from '../AuthForm/AuthForm';
+import React from "react";
+import { Box, Container, Flex, Image, VStack } from "@chakra-ui/react";
+import AuthForm from "../AuthForm/AuthForm";
+import "../AuthForm/AuthForm.css";
 
 function AuthPage() {
   return (
-    <Flex minH={"100vh"} justifyContent={"center"} alignItems={"center"} px={450}>
-        <Container maxW={"container.md"} padding={0}>
-        <Flex minH={"100vh"} justifyContent={"center"} alignItems={"center"} gap={10}>
+    <Flex className="auth-container">
+      <Container className="auth-content">
+        <Flex className="auth-flex-container">
+          <Box className="auth-image-container">
+            <Image src="/auth.png" className="auth-image" alt="image" />
+          </Box>
 
-            <Box display={{bse:"none",md:"block"}}>
-                <Image src='/auth.png' h={650} alt='image' />
-            </Box>
-
-            <VStack spacing={4} align={'stretch'}>
-                <AuthForm/>
-            </VStack>
+          <VStack spacing={4} align={"stretch"}>
+            <AuthForm />
+          </VStack>
         </Flex>
-        </Container>
+      </Container>
     </Flex>
-  )
+  );
 }
 
-export default AuthPage
+export default AuthPage;
