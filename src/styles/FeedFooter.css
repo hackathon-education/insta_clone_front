@@ -1,0 +1,60 @@
+.feed-footer {
+  margin-top: auto;
+  margin-bottom: 2.5rem; /* mb={10} */
+  font-family: Arial, sans-serif;
+}
+
+/* 아이콘 영역 */
+.feed-footer-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.icon-button {
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+/* 좋아요 텍스트 */
+.likes-text {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+/* 댓글 박스 */
+.comment-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.comment-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #dbdbdb;
+  font-size: 14px;
+  padding: 6px 4px;
+  outline: none;
+}
+
+.comment-post-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0095f6;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.comment-post-btn:hover {
+  color: #005bb5;
+}

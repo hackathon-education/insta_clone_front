@@ -1,36 +1,32 @@
-import { Flex, Text, Box } from '@chakra-ui/react'
-import {BsGrid3X3,BsBookmark,BsSuitHeart} from 'react-icons/bs'
-import React from 'react'
+import React from "react";
+import { BsGrid3X3, BsBookmark, BsSuitHeart } from "react-icons/bs";
+import "../../styles/ProfileTab.css";
 
 function ProfileTab() {
   return (
-    <Flex w={'full'} justifyContent={'center'} gap={10} textTransform={'uppercase'} fontWeight={'bold'} mt={2} mb={2}>
-      <Flex alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-          <BsGrid3X3/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Posts
-        </Text>
-      </Flex>  
-      <Flex alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-           <BsBookmark/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Saved
-        </Text>
-      </Flex>  
-      <Flex  alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-          <BsSuitHeart fontWeight={'bold'}/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Likes
-        </Text>
-      </Flex>  
-    </Flex>
-  )
+    <div className="profile-tab">
+      <div className="tab-item">
+        <span className="tab-icon">
+          <BsGrid3X3 />
+        </span>
+        <span className="tab-text">Posts</span>
+      </div>
+
+      <div className="tab-item">
+        <span className="tab-icon">
+          <BsBookmark />
+        </span>
+        <span className="tab-text">Saved</span>
+      </div>
+
+      <div className="tab-item">
+        <span className="tab-icon">
+          <BsSuitHeart />
+        </span>
+        <span className="tab-text">Likes</span>
+      </div>
+    </div>
+  );
 }
 
-export default ProfileTab
+export default ProfileTab;

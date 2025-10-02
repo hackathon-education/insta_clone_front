@@ -1,0 +1,30 @@
+.profile-tab {
+  display: flex;
+  justify-content: center;
+  gap: 40px;              /* gap={10} 비슷하게 */
+  margin: 8px 0;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.tab-item:hover {
+  color: #0095f6;
+}
+
+.tab-icon {
+  font-size: 20px;
+}
+
+.tab-text {
+  font-size: 12px;
+  display: block;
+}

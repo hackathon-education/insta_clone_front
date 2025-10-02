@@ -1,0 +1,9 @@
+.profile-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;              /* 원래 gap={1}, columnGap={1} → 2px 정도 */
+}
+
+.profile-posts-grid > * {
+  aspect-ratio: 1 / 1;   /* 정사각형 유지 */
+}

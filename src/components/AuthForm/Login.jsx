@@ -1,7 +1,6 @@
-import { React, useState, useEffect } from "react";
-import { Button, Input, Alert, AlertIcon } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./AuthForm.css";
+import "../../styles/AuthForm.css";
 
 function Login() {
   const [input, setInput] = useState({
@@ -18,7 +17,6 @@ function Login() {
   useEffect(() => {
     if (location.state?.message) {
       setSuccessMessage(location.state.message);
-      // state 초기화 (뒤로가기 시 메시지가 다시 나오지 않도록)
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -36,9 +34,7 @@ function Login() {
     try {
       const response = await fetch("http://localhost:1010/api/v1/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: input.email,
           password: input.password,
@@ -49,12 +45,10 @@ function Login() {
         const result = await response.json();
         console.log("로그인 성공:", result);
 
-        // 토큰을 localStorage에 저장
         if (result.token) {
           localStorage.setItem("token", result.token);
         }
 
-        // 메인 페이지로 리다이렉션
         navigate("/");
       } else {
         const errorData = await response.text();
@@ -78,56 +72,48 @@ function Login() {
   return (
     <div className="form-container">
       {successMessage && (
-        <Alert status="success" className="success-alert">
-          <AlertIcon />
-          {successMessage}
-        </Alert>
+        <div className="success-alert" role="alert">
+          ✓ {successMessage}
+        </div>
       )}
 
       {error && (
-        <Alert status="error" className="error-alert">
-          <AlertIcon />
-          {error}
-        </Alert>
+        <div className="error-alert" role="alert">
+          ✗ {error}
+        </div>
       )}
 
       <div className="input-container">
-        <Input
+        <input
           placeholder="Email"
-          fontSize={15}
           type="email"
           value={input.email}
           onChange={(e) => setInput({ ...input, email: e.target.value })}
           onKeyPress={handleKeyPress}
-          isDisabled={isLoading}
+          disabled={isLoading}
+          className="input-field"
         />
       </div>
 
       <div className="input-container">
-        <Input
+        <input
           placeholder="Password"
-          fontSize={15}
           type="password"
           value={input.password}
           onChange={(e) => setInput({ ...input, password: e.target.value })}
           onKeyPress={handleKeyPress}
-          isDisabled={isLoading}
+          disabled={isLoading}
+          className="input-field"
         />
       </div>
 
-      <Button
-        colorScheme={"blue"}
-        width={"150px"}
-        variant={"outline"}
-        fontSize={15}
+      <button
         onClick={handleLogin}
-        isLoading={isLoading}
-        loadingText="로그인 중..."
+        disabled={isLoading}
         className="form-button"
-        alignSelf="center"
       >
-        Log in
-      </Button>
+        {isLoading ? "로그인 중..." : "Log in"}
+      </button>
     </div>
   );
 }

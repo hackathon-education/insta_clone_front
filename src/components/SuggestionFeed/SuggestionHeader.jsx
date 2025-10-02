@@ -1,27 +1,25 @@
-import { Flex,Avatar,Text, Box, Link,Button} from '@chakra-ui/react'
-import {Link as RouterLink} from 'react-router-dom'
-import React from 'react'
-
+import React from "react";
+import { Link } from "react-router-dom";
+import "../../styles/SuggestionHeader.css";
 
 function SuggestionHeader() {
   return (
-    <>
-        <Flex justifyContent={'center'} alignItems={'center'} mt={5}>
-            <Avatar src='/profilepic.png' size={'sm'}/>
-            
-            <Flex fontSize={15} fontWeight={"bold"} gap={2} p={5}>
-               Aditya
-            </Flex> 
-            <Flex ml={'50px'}>
-            <Link to = {'/login'} as={RouterLink} display={'block'} cursor={'pointer'}>
-                <Button colorScheme='teal' variant='ghost' size={'sm'} >
-                    Log Out
-                </Button>
-            </Link>
-            </Flex>
-        </Flex>
-    </>
-  )
+    <div className="suggestion-header">
+      {/* 아바타 */}
+      <img src="/profilepic.png" alt="Aditya" className="suggestion-avatar" />
+
+      {/* 유저명 */}
+      <span className="suggestion-username">Aditya</span>
+
+      {/* 로그아웃 링크 */}
+      <div className="suggestion-logout">
+        <Link to="/login" className="logout-link">
+          {/* 필요 시 버튼으로 교체 가능 */}
+          Log Out
+        </Link>
+      </div>
+    </div>
+  );
 }
 
-export default SuggestionHeader
+export default SuggestionHeader;

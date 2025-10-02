@@ -1,0 +1,31 @@
+.homepage {
+  max-width: 960px;         /* container.lg */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.homepage-main {
+  display: flex;
+  gap: 40px;                /* gap={20} */
+}
+
+/* 피드 영역 */
+.homepage-feed {
+  flex: 2;
+  max-width: 300px;
+  margin-left: 300px;       /* ml={300} */
+}
+
+/* 추천 사용자 영역 */
+.homepage-suggestions {
+  flex: 3;
+  max-width: 300px;
+  margin-right: 20px;       /* mr={20} */
+}
+
+/* 반응형 - 작은 화면에서 추천 영역 숨김 */
+@media (max-width: 1024px) {
+  .homepage-suggestions {
+    display: none;
+  }
+}

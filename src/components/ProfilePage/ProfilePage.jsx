@@ -1,21 +1,24 @@
-import React from 'react'
-import {Container,Flex } from '@chakra-ui/react'
-import ProfileHeader from '../Profile/ProfileHeader'
-import ProfileTab from '../Profile/ProfileTab'
-import ProfilePosts from '../Profile/ProfilePosts'
+import React from "react";
+import ProfileHeader from "../Profile/ProfileHeader";
+import ProfileTab from "../Profile/ProfileTab";
+import ProfilePosts from "../Profile/ProfilePosts";
+import "../../styles/ProfilePage.css";
 
 function ProfilePage() {
   return (
-    <Container maxW='container.lg' py={5} ml={125}>
-      <Flex py={10} px={4} pl={{base:4,md:10}} w={'full'} mx={'auto'} flexDirection={'column'}>
-        <ProfileHeader/>
-      </Flex>
-      <Flex px={{base:2 , sm:4}} maxW={'full'} mx={'auto'} borderTop={'1px solid'} borderColor={'whiteAlpha.300'} direction={'column'}>
-        <ProfileTab/>
-        <ProfilePosts/>
-      </Flex>
-    </Container>
-  )
+    <div className="profile-page">
+      {/* 상단 프로필 헤더 */}
+      <div className="profile-header-section">
+        <ProfileHeader />
+      </div>
+
+      {/* 탭 + 게시물 */}
+      <div className="profile-content-section">
+        <ProfileTab />
+        <ProfilePosts />
+      </div>
+    </div>
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;

@@ -1,0 +1,25 @@
+.profile-page {
+  max-width: 960px;          /* container.lg 비슷 */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 프로필 헤더 영역 */
+.profile-header-section {
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 16px;        /* py={10} px={4} */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 탭 + 게시물 영역 */
+.profile-content-section {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;           /* px={{base:2, sm:4}} */
+  border-top: 1px solid #dbdbdb;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

@@ -1,0 +1,6 @@
+.feedposts-container {
+  max-width: 640px;   /* container.sm */
+  width: 100%;
+  padding: 40px 8px;  /* py={10}, px={2} */
+  margin: 0 auto;
+}
