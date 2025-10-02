@@ -1,57 +1,47 @@
-import { Box, Button, Flex,Input,InputGroup,InputRightElement,Text } from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { CommentLogo, NotificationsLogo,UnlikeLogo } from '../../assests/logos';
+import React, { useState } from "react";
+import { CommentLogo, NotificationsLogo, UnlikeLogo } from "../../assests/logos";
+import "../../styles/FeedFooter.css";
 
 function FeedFooter() {
-  const[liked,setLiked] = useState(false);
-  const[likes,setLikes] =useState(0);
-  
-  const handleLike =()=>
-  {
-    if(liked)
-    {
-      setLiked(flase);
-      setLikes(likes-1);
-    }
-    else
-    {
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(0);
+
+  const handleLike = () => {
+    if (liked) {
+      setLiked(false);
+      setLikes(likes - 1);
+    } else {
       setLiked(true);
-      setLikes(likes+1);
+      setLikes(likes + 1);
     }
-  }
+  };
+
   return (
-    <Box mb={10} mt={'auto'}>
-    <Flex justifyItems={'center'} gap={4} mt={3}>
-      <Box onClick={handleLike} cursor={'pointer'} fontSize={8}>
-        {!liked ? <NotificationsLogo /> : <UnlikeLogo />}
-      </Box>
-      <Box cursor={'pointer'} fontSize={18}>
-        <CommentLogo/>
-      </Box>
-    </Flex>
-    <Text fontSize={'sm'} fontWeight={600}>
-      {likes} likes
-    </Text>
-    <Flex alignItems={'center'} gap={2} justifyContent={'space-between'} w={'full'}>
-      <InputGroup>
-        <Input variant={'flushed'} placeholder ={"Add a comment..."} fontSize={14} />
-        <InputRightElement>
-          <Button
-            fontSize={14}
-            color={'blue'}
-            fontWeight={600}
-            cursor={'pointer'}
-            _hover={{color:'white'}}
-            bg={"transparent"}
-            >
-              Post
-            </Button>
-        </InputRightElement>
-      </InputGroup>
-    </Flex>
-    
-    </Box>
-  )
+    <div className="feed-footer">
+      {/* 아이콘 영역 */}
+      <div className="feed-footer-icons">
+        <div className="icon-button" onClick={handleLike}>
+          {!liked ? <NotificationsLogo /> : <UnlikeLogo />}
+        </div>
+        <div className="icon-button">
+          <CommentLogo />
+        </div>
+      </div>
+
+      {/* 좋아요 카운트 */}
+      <p className="likes-text">{likes} likes</p>
+
+      {/* 댓글 입력 영역 */}
+      <div className="comment-box">
+        <input
+          type="text"
+          placeholder="Add a comment..."
+          className="comment-input"
+        />
+        <button className="comment-post-btn">Post</button>
+      </div>
+    </div>
+  );
 }
 
-export default FeedFooter
+export default FeedFooter;

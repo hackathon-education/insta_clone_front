@@ -1,0 +1,41 @@
+.suggestion-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px; /* mt={5} */
+  gap: 12px;
+  font-family: Arial, sans-serif;
+}
+
+/* 아바타 */
+.suggestion-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 유저명 */
+.suggestion-username {
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0 20px;
+}
+
+/* 로그아웃 영역 */
+.suggestion-logout {
+  margin-left: 50px;
+}
+
+.logout-link {
+  color: #0095f6;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.logout-link:hover {
+  text-decoration: underline;
+  color: #005bb5;
+}

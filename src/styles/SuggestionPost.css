@@ -1,0 +1,37 @@
+.suggestion-post {
+  display: flex;
+  align-items: center;
+  gap: 12px;              /* gap={5} 비슷 */
+  margin-bottom: 16px;    /* mb={4} */
+  font-family: Arial, sans-serif;
+}
+
+.suggestion-avatar {
+  width: 32px;           /* size="sm" */
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.suggestion-username {
+  font-size: 14px;
+  color: #262626;
+}
+
+.suggestion-follow {
+  margin-left: auto;      /* Box ml="auto" */
+}
+
+.follow-link {
+  font-size: 15px;
+  font-weight: bold;
+  color: teal;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.follow-link:hover {
+  text-decoration: underline;
+  color: #006d6d;
+}

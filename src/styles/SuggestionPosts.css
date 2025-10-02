@@ -1,0 +1,13 @@
+.suggestion-posts {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+/* 추천 리스트 */
+.suggestion-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}

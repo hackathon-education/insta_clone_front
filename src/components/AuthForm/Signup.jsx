@@ -1,17 +1,6 @@
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Alert,
-  AlertIcon,
-  Text,
-  Box,
-} from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import "./AuthForm.css";
+import "../../styles/Signup.css";
 
 const Signup = ({ onSignupSuccess }) => {
   const [inputs, setInputs] = useState({
@@ -20,9 +9,8 @@ const Signup = ({ onSignupSuccess }) => {
     password: "",
     confirmPassword: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); // 선택: 성공 안내
   const [isLoading, setIsLoading] = useState(false);
   const [passwordValidation, setPasswordValidation] = useState({
     length: false,
@@ -35,59 +23,52 @@ const Signup = ({ onSignupSuccess }) => {
 
   // 비밀번호 유효성 검사
   useEffect(() => {
-    const password = inputs.password;
+    const password = inputs.password || "";
     setPasswordValidation({
       length: password.length >= 8,
       hasLetter: /[a-zA-Z]/.test(password),
       hasNumber: /\d/.test(password),
-      hasSpecial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+      hasSpecial: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
     });
   }, [inputs.password]);
 
-  // 비밀번호 확인 일치 여부 검사
+  // 비밀번호 확인
   useEffect(() => {
-    if (inputs.confirmPassword === "") {
-      setPasswordMatch(null);
-    } else {
-      setPasswordMatch(inputs.password === inputs.confirmPassword);
-    }
+    if (!inputs.confirmPassword) setPasswordMatch(null);
+    else setPasswordMatch(inputs.password === inputs.confirmPassword);
   }, [inputs.password, inputs.confirmPassword]);
 
-  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+  const isPasswordValid = useMemo(
+    () => Object.values(passwordValidation).every(Boolean),
+    [passwordValidation]
+  );
+
+  const isFormValid = useMemo(() => {
+    return (
+      inputs.name.trim() &&
+      inputs.email.trim() &&
+      isPasswordValid &&
+      passwordMatch
+    );
+  }, [inputs, isPasswordValid, passwordMatch]);
 
   const handleSignup = async () => {
-    if (
-      !inputs.name ||
-      !inputs.email ||
-      !inputs.password ||
-      !inputs.confirmPassword
-    ) {
-      setError("모든 필드를 입력해주세요.");
-      return;
-    }
-
-    if (!isPasswordValid) {
-      setError("비밀번호 요구사항을 모두 만족해야 합니다.");
-      return;
-    }
-
-    if (!passwordMatch) {
-      setError("비밀번호가 일치하지 않습니다.");
+    if (!isFormValid) {
+      setError("입력값을 확인해주세요.");
       return;
     }
 
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const response = await fetch("http://localhost:1010/api/v1/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: inputs.email,
-          name: inputs.name,
+          email: inputs.email.trim(),
+          name: inputs.name.trim(),
           password: inputs.password,
         }),
       });
@@ -96,181 +77,123 @@ const Signup = ({ onSignupSuccess }) => {
         const result = await response.json();
         console.log("회원가입 성공:", result);
 
-        // onSignupSuccess prop이 있으면 호출 (AuthForm에서 사용)
+        const msg = "회원가입이 완료되었습니다. 로그인해주세요.";
         if (onSignupSuccess) {
-          onSignupSuccess("회원가입이 완료되었습니다. 로그인해주세요.");
+          onSignupSuccess(msg);
         } else {
-          // 별도 페이지인 경우
-          navigate("/login", {
-            state: { message: "회원가입이 완료되었습니다. 로그인해주세요." },
-          });
+          // 라우트가 /login 이 없다면 /auth 로 보내는 게 안전
+          navigate("/auth", { state: { message: msg } });
         }
+        setSuccess(msg);
       } else {
-        const errorData = await response.text();
-        console.log("회원가입 실패:", errorData);
         setError("회원가입에 실패했습니다. 입력 정보를 확인해주세요.");
       }
-    } catch (error) {
-      console.error("에러:", error);
+    } catch (err) {
+      console.error("에러:", err);
       setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSignup();
-    }
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") handleSignup();
   };
 
   return (
-    <div className="form-container">
+    <div className="form-container" onKeyDown={onKeyDown}>
       {error && (
-        <Alert status="error" className="error-alert">
-          <AlertIcon />
+        <div className="error-alert" role="alert" aria-live="assertive">
           {error}
-        </Alert>
+        </div>
+      )}
+      {success && (
+        <div className="success-alert" role="status" aria-live="polite">
+          {success}
+        </div>
       )}
 
-      <div className="input-container">
-        <Input
-          placeholder="Email"
-          fontSize={14}
-          type="email"
-          size={"sm"}
-          value={inputs.email}
-          onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
-          onKeyPress={handleKeyPress}
-          isDisabled={isLoading}
-        />
-      </div>
+      <input
+        type="email"
+        placeholder="Email"
+        autoComplete="email"
+        value={inputs.email}
+        onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+        disabled={isLoading}
+        className="input-field"
+      />
 
-      <div className="input-container">
-        <Input
-          placeholder="Username"
-          fontSize={14}
-          type="text"
-          size={"sm"}
-          value={inputs.name}
-          onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
-          onKeyPress={handleKeyPress}
-          isDisabled={isLoading}
-        />
-      </div>
+      <input
+        type="text"
+        placeholder="Username"
+        autoComplete="username"
+        value={inputs.name}
+        onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
+        disabled={isLoading}
+        className="input-field"
+      />
 
-      <div className="input-container">
-        <InputGroup>
-          <Input
-            placeholder="Password"
-            fontSize={14}
-            type={showPassword ? "text" : "password"}
-            value={inputs.password}
-            size={"sm"}
-            onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
-            onKeyPress={handleKeyPress}
-            isDisabled={isLoading}
-            borderColor={inputs.password && !isPasswordValid ? "red.300" : ""}
-          />
-          <InputRightElement h="full">
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              onClick={() => setShowPassword(!showPassword)}
-              isDisabled={isLoading}
-            >
-              {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
+      <input
+        type="password"
+        placeholder="Password"
+        autoComplete="new-password"
+        value={inputs.password}
+        onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+        disabled={isLoading}
+        className={`input-field ${
+          inputs.password && !isPasswordValid ? "invalid" : inputs.password && isPasswordValid ? "valid" : ""
+        }`}
+      />
 
-        {/* 비밀번호 요구사항 표시 */}
-        {inputs.password && (
-          <Box mt={2} p={2} bg="gray.50" borderRadius="md" fontSize="xs">
-            <Text color={passwordValidation.length ? "green.500" : "red.500"}>
-              ✓ 8자 이상 {passwordValidation.length ? "✓" : "✗"}
-            </Text>
-            <Text
-              color={passwordValidation.hasLetter ? "green.500" : "red.500"}
-            >
-              ✓ 영문자 포함 {passwordValidation.hasLetter ? "✓" : "✗"}
-            </Text>
-            <Text
-              color={passwordValidation.hasNumber ? "green.500" : "red.500"}
-            >
-              ✓ 숫자 포함 {passwordValidation.hasNumber ? "✓" : "✗"}
-            </Text>
-            <Text
-              color={passwordValidation.hasSpecial ? "green.500" : "red.500"}
-            >
-              ✓ 특수문자 포함 {passwordValidation.hasSpecial ? "✓" : "✗"}
-            </Text>
-          </Box>
-        )}
-      </div>
+      {inputs.password && (
+        <div className="password-rules">
+          <p className={passwordValidation.length ? "valid" : "invalid"}>
+            {passwordValidation.length ? "✓" : "✗"} 8자 이상
+          </p>
+          <p className={passwordValidation.hasLetter ? "valid" : "invalid"}>
+            {passwordValidation.hasLetter ? "✓" : "✗"} 영문자 포함
+          </p>
+          <p className={passwordValidation.hasNumber ? "valid" : "invalid"}>
+            {passwordValidation.hasNumber ? "✓" : "✗"} 숫자 포함
+          </p>
+          <p className={passwordValidation.hasSpecial ? "valid" : "invalid"}>
+            {passwordValidation.hasSpecial ? "✓" : "✗"} 특수문자 포함
+          </p>
+        </div>
+      )}
 
-      <div className="input-container">
-        <InputGroup>
-          <Input
-            placeholder="Confirm Password"
-            fontSize={14}
-            type={showConfirmPassword ? "text" : "password"}
-            value={inputs.confirmPassword}
-            size={"sm"}
-            onChange={(e) =>
-              setInputs({ ...inputs, confirmPassword: e.target.value })
-            }
-            onKeyPress={handleKeyPress}
-            isDisabled={isLoading}
-            borderColor={
-              inputs.confirmPassword && passwordMatch === false
-                ? "red.300"
-                : inputs.confirmPassword && passwordMatch === true
-                ? "green.300"
-                : ""
-            }
-          />
-          <InputRightElement h="full">
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              isDisabled={isLoading}
-            >
-              {showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
 
-        {/* 비밀번호 일치 여부 표시 */}
-        {inputs.confirmPassword && (
-          <Text
-            fontSize="xs"
-            mt={1}
-            color={passwordMatch ? "green.500" : "red.500"}
-          >
-            {passwordMatch
-              ? "✓ 비밀번호가 일치합니다"
-              : "✗ 비밀번호가 일치하지 않습니다"}
-          </Text>
-        )}
-      </div>
-
-      <Button
-        w={"full"}
-        colorScheme="blue"
-        size={"sm"}
-        fontSize={14}
-        onClick={handleSignup}
-        isLoading={isLoading}
-        loadingText="가입 중..."
-        className="form-button"
-        isDisabled={
-          !isPasswordValid || !passwordMatch || !inputs.name || !inputs.email
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        autoComplete="new-password"
+        value={inputs.confirmPassword}
+        onChange={(e) =>
+          setInputs({ ...inputs, confirmPassword: e.target.value })
         }
+        disabled={isLoading}
+        className={`input-field ${
+          inputs.confirmPassword
+            ? passwordMatch
+              ? "valid"
+              : "invalid"
+            : ""
+        }`}
+      />
+
+      {inputs.confirmPassword && (
+        <p className={`status-text ${passwordMatch ? "valid" : "invalid"}`}>
+          {passwordMatch ? "✓ 비밀번호가 일치합니다" : "✗ 비밀번호가 일치하지 않습니다"}
+        </p>
+      )}
+
+      <button
+        onClick={handleSignup}
+        disabled={isLoading || !isFormValid}
+        className="form-button"
       >
-        Sign Up
-      </Button>
+        {isLoading ? "가입 중..." : "Sign Up"}
+      </button>
     </div>
   );
 };

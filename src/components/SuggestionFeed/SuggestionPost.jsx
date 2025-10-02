@@ -1,24 +1,22 @@
-import { Avatar, Flex,VStack,Text,Box,Link} from '@chakra-ui/react'
-import React from 'react'
-import {Link as RouterLink} from 'react-router-dom'
+import React from "react";
+import { Link } from "react-router-dom";
+import "../../styles/SuggestionPost.css";
 
-export default function SuggestionPost({avatar,username}) {
+export default function SuggestionPost({ avatar, username }) {
   return (
-    
-      <Flex  alignItems={'center'} gap={5} mb={4}>
-        <Avatar src={avatar} size={'sm'}/>
-        <Text>
-            {username}
-        </Text>
-        
-        <Box ml={'auto'}>
-          <Text fontSize={15} fontWeight={'bold'} color={'teal'}>
-            <Link to={'/'} as={RouterLink}>
-              Follow
-            </Link>
-          </Text>
-        </Box>
-      </Flex>
-   
-  )
+    <div className="suggestion-post">
+      {/* 아바타 */}
+      <img src={avatar} alt={username} className="suggestion-avatar" />
+
+      {/* 유저 이름 */}
+      <span className="suggestion-username">{username}</span>
+
+      {/* 팔로우 버튼 */}
+      <div className="suggestion-follow">
+        <Link to="/" className="follow-link">
+          Follow
+        </Link>
+      </div>
+    </div>
+  );
 }

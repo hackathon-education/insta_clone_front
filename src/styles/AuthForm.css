@@ -1,0 +1,212 @@
+/* ========== 공통 레이아웃 ========== */
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;                 /* 과도한 450px 패딩 제거 */
+  box-sizing: border-box;
+}
+
+.auth-content {
+  width: 100%;
+  max-width: 1040px;             /* 페이지 전체 최대폭 */
+  margin: 0 auto;
+}
+
+.auth-flex-container {
+  display: grid;                  /* md 이상에서 2열, 모바일 1열 */
+  grid-template-columns: 1fr;     /* 모바일: 폼만 중앙 */
+  align-items: center;
+  gap: 40px;
+}
+
+@media (min-width: 900px) {
+  .auth-flex-container {
+    grid-template-columns: minmax(0, 1fr) 380px;  /* 이미지 / 폼(고정폭) */
+  }
+}
+
+.auth-image-container {
+  display: none;
+}
+@media (min-width: 768px) {
+  .auth-image-container {
+    display: block;
+  }
+}
+
+/* 화면비 상관없이 이미지가 박스 안에 알맞게 */
+.auth-image {
+  width: 100%;
+  max-height: 640px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ========== Auth Form Box ========== */
+.auth-form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  justify-content: center;
+  margin-top: 0;                  /* 10vh 제거: 중앙 정렬 유지 */
+}
+
+.auth-main-box {
+  width: 100%;
+  max-width: 380px;               /* 폼 최대폭 고정 */
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+}
+
+.auth-vstack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-logo {
+  height: 75px;
+  cursor: pointer;
+  margin: 0 auto 8px;
+}
+
+/* ========== Divider (OR 구분선) ========== */
+.auth-divider-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin: 12px 0;
+}
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: #dbdbdb;
+}
+.auth-divider-text {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+/* ========== 하단 전환 박스 ========== */
+.auth-bottom-box {
+  width: 100%;
+  max-width: 380px;               /* 폼과 동일한 폭 */
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+.auth-bottom-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-bottom-text {
+  margin: 0 8px;
+  font-size: 14px;
+  color: #262626;
+}
+.auth-bottom-link {
+  color: #0095f6;
+  cursor: pointer;
+  font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.auth-bottom-link:hover {
+  text-decoration: underline;
+}
+
+/* ========== Google Auth 버튼 ========== */
+.google-auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  background: #fff;
+}
+.google-auth-container:hover { background: #f5f5f5; }
+.google-auth-icon { width: 20px; height: 20px; }
+.google-auth-text { font-size: 14px; color: #262626; font-weight: 500; }
+
+/* ========== 개별 Form ========== */
+.form-container { display: flex; flex-direction: column; gap: 12px; }
+.input-container { margin-bottom: 12px; }
+.input-container:last-child { margin-bottom: 16px; }
+.input-field {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.input-field:disabled { background: #f5f5f5; }
+
+/* ========== 성공/에러 알림 ========== */
+.success-alert {
+  background: #edf7ed;
+  color: #1e7e34;
+  border: 1px solid #c7e5c8;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.error-alert {
+  background: #fdecea;
+  color: #b91c1c;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* ========== 버튼 ========== */
+.form-button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;                /* 기본을 파란 배경 흰 글씨로 */
+  border: 1px solid #0095f6;
+  border-radius: 8px;
+  background: #0095f6;
+  cursor: pointer;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+.form-button:hover:not(:disabled) {
+  background: #007acc;
+  border-color: #007acc;
+}
+.form-button:disabled {
+  background: #e0e0e0;
+  border-color: #aaa;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* ========== 링크 ========== */
+.form-link-text { text-align: center; font-size: 14px; }
+.form-link { color: #3182ce; text-decoration: none; }
+.form-link:hover { text-decoration: underline; }

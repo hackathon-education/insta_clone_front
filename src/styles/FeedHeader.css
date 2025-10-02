@@ -1,0 +1,41 @@
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+/* 왼쪽 (아바타 + 유저네임) */
+.feed-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-username {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Unfollow 버튼 */
+.unfollow-btn {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0095f6;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.unfollow-btn:hover {
+  color: #000;
+}
