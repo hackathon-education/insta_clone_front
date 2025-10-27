@@ -1,11 +1,9 @@
-// src/components/FeedPosts/FeedPosts.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import FeedPost from "./FeedPost";
 import "../../styles/FeedPosts.css";
+import { API_BASE } from "../../api/http";
+import { listSaved, savePost, unsavePost } from "../../api/saved";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:1010";
-
-// 상대 경로(/images/...)면 백엔드 호스트를 붙여 절대 URL로 변환
 const toImageUrl = (path) => {
   if (!path) return "";
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
@@ -13,6 +11,7 @@ const toImageUrl = (path) => {
 
 function FeedPosts() {
   const [posts, setPosts] = useState([]);
+  const [savedSet, setSavedSet] = useState(new Set()); // postId 집합
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
@@ -23,18 +22,23 @@ function FeedPosts() {
       setLoading(true);
       setErr(null);
       try {
+        // 1) 포스트 전체
         const res = await fetch(`${API_BASE}/api/v1/posts`, {
           headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        const sorted = [...data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // 2) 저장 목록
+        const saved = await listSaved();
+        const set = new Set(saved?.map((s) => s.postId));
 
         if (!cancelled) {
-          // createdAt 최신순 정렬(옵션)
-          const sorted = [...data].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
           setPosts(sorted);
+          setSavedSet(set);
         }
       } catch (e) {
         if (!cancelled) setErr(e.message || "Failed to fetch posts");
@@ -49,7 +53,37 @@ function FeedPosts() {
     };
   }, []);
 
-  // 로딩 스켈레톤
+  const postsWithSaved = useMemo(
+    () => posts.map((p) => ({ ...p, isSaved: savedSet.has(p.postId) })),
+    [posts, savedSet]
+  );
+
+  // 하트 클릭 핸들러 (저장/해제 토글)
+  const toggleSave = async (postId, next) => {
+    // next: true(저장), false(해제)
+    // 낙관적 적용
+    setSavedSet((prev) => {
+      const clone = new Set(prev);
+      if (next) clone.add(postId);
+      else clone.delete(postId);
+      return clone;
+    });
+
+    try {
+      if (next) await savePost(postId);
+      else await unsavePost(postId);
+    } catch (e) {
+      // 실패 시 롤백
+      setSavedSet((prev) => {
+        const clone = new Set(prev);
+        if (next) clone.delete(postId);
+        else clone.add(postId);
+        return clone;
+      });
+      alert(`저장 상태 변경에 실패했어요. (${e.message})`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="feedposts-container">
@@ -71,7 +105,6 @@ function FeedPosts() {
     );
   }
 
-  // 에러
   if (err) {
     return (
       <div className="feedposts-container">
@@ -80,8 +113,7 @@ function FeedPosts() {
     );
   }
 
-  // 빈 상태
-  if (!posts.length) {
+  if (!postsWithSaved.length) {
     return (
       <div className="feedposts-container">
         <div className="feed-empty">아직 게시물이 없어요.</div>
@@ -89,19 +121,20 @@ function FeedPosts() {
     );
   }
 
-  // 정상 렌더
   return (
     <div className="feedposts-container">
-      {posts.map((p) => (
+      {postsWithSaved.map((p) => (
         <FeedPost
           key={p.postId}
-          img={toImageUrl(p.image)}                 // ← 백엔드에서 서빙되는 이미지
-          username={p.userId}                       // 임시로 userId 노출
-          avatar={`/avatars/${p.userId}.png`}  // 폴백 아바타(프론트 public)
+          img={toImageUrl(p.image)}
+          username={p.userId}
+          avatar={`/avatars/${p.userId}.png`}
           content={p.content}
           createdAt={p.createdAt}
           initialLikes={p.likes}
           commentCount={p.comments}
+          isSaved={p.isSaved}                       // ★ 추가
+          onToggleSave={(next) => toggleSave(p.postId, next)} // ★ 추가
         />
       ))}
     </div>
