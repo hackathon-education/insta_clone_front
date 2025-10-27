@@ -9,9 +9,9 @@ const toImageUrl = (path) => {
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
 };
 
-function FeedPosts() {
+function FeedPosts({ token } = {}) {
   const [posts, setPosts] = useState([]);
-  const [savedSet, setSavedSet] = useState(new Set()); // postId 집합
+  const [savedSet, setSavedSet] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
@@ -22,25 +22,53 @@ function FeedPosts() {
       setLoading(true);
       setErr(null);
       try {
-        // 1) 포스트 전체
-        const res = await fetch(`${API_BASE}/api/v1/posts`, {
+        const url = `${API_BASE}/api/v1/posts`;
+        const res = await fetch(url, {
           headers: { Accept: "application/json" },
+          credentials: token ? "omit" : "include",
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const sorted = [...data].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`HTTP ${res.status} ${res.statusText} - ${text}`);
+        }
 
-        // 2) 저장 목록
-        const saved = await listSaved();
+        const data = await res.json();
+
+        let arr = [];
+        if (Array.isArray(data)) arr = data;
+        else if (data && Array.isArray(data.content)) arr = data.content;
+
+        const normalized = arr.map((p) => ({
+          postId: p.postId ?? p.id ?? p.post_id,
+          image: p.image ?? p.imageUrl ?? p.img,
+          userId: p.userId ?? p.username ?? p.author,
+          content: p.content ?? p.body ?? "",
+          createdAt: p.createdAt ?? p.created_at ?? p.createdDate ?? null,
+          likes: p.likes ?? p.likeCount ?? 0,
+          comments: p.comments ?? p.commentCount ?? 0,
+        }));
+
+        normalized.sort((a, b) => {
+          const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return tb - ta;
+        });
+
+        // 저장 목록 불러오기
+        let saved = [];
+        try {
+          saved = await listSaved({ token });
+        } catch (e) {
+          console.warn("[FeedPosts] listSaved failed:", e);
+        }
         const set = new Set(saved?.map((s) => s.postId));
 
         if (!cancelled) {
-          setPosts(sorted);
+          setPosts(normalized);
           setSavedSet(set);
         }
       } catch (e) {
+        console.error("[FeedPosts] load error:", e);
         if (!cancelled) setErr(e.message || "Failed to fetch posts");
       } finally {
         if (!cancelled) setLoading(false);
@@ -51,17 +79,15 @@ function FeedPosts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [token]);
 
   const postsWithSaved = useMemo(
     () => posts.map((p) => ({ ...p, isSaved: savedSet.has(p.postId) })),
     [posts, savedSet]
   );
 
-  // 하트 클릭 핸들러 (저장/해제 토글)
   const toggleSave = async (postId, next) => {
-    // next: true(저장), false(해제)
-    // 낙관적 적용
+    // optimistic
     setSavedSet((prev) => {
       const clone = new Set(prev);
       if (next) clone.add(postId);
@@ -70,10 +96,10 @@ function FeedPosts() {
     });
 
     try {
-      if (next) await savePost(postId);
-      else await unsavePost(postId);
+      if (next) await savePost(postId, { token });
+      else await unsavePost(postId, { token });
     } catch (e) {
-      // 실패 시 롤백
+      // rollback
       setSavedSet((prev) => {
         const clone = new Set(prev);
         if (next) clone.delete(postId);
@@ -126,15 +152,15 @@ function FeedPosts() {
       {postsWithSaved.map((p) => (
         <FeedPost
           key={p.postId}
-          img={toImageUrl(p.image)}
-          username={p.userId}
-          avatar={`/avatars/${p.userId}.png`}
+          img={toImageUrl(p.image || "")}
+          username={p.userId || "unknown"}
+          avatar={`${API_BASE}/avatars/${p.userId || "default"}.png`}
           content={p.content}
           createdAt={p.createdAt}
           initialLikes={p.likes}
           commentCount={p.comments}
-          isSaved={p.isSaved}                       // ★ 추가
-          onToggleSave={(next) => toggleSave(p.postId, next)} // ★ 추가
+          isSaved={p.isSaved}
+          onToggleSave={(next) => toggleSave(p.postId, next)}
         />
       ))}
     </div>

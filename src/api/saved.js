@@ -1,17 +1,70 @@
-import { httpGet, httpPost, httpDelete } from "./http";
+// src/api/saved.js
+import { API_BASE } from "./http";
 
-// 1) 게시물 저장
-export async function savePost(postId) {
-  return httpPost("/api/v1/saved", { postId });
+const pickToken = (tokenArg) =>
+  tokenArg ??
+  localStorage.getItem("accessToken") ??
+  localStorage.getItem("token"); // 키 이름 둘 중 하나 쓰고 있다면
+
+const authHeaders = (token) => (token ? { Authorization: `Bearer ${token}` } : {});
+const authCreds = (token) => (token ? "omit" : "include"); // JWT면 omit, 세션이면 include
+
+export async function listSaved({ token } = {}) {
+  const t = pickToken(token);
+  const res = await fetch(`${API_BASE}/api/v1/saved`, {
+    headers: {
+      Accept: "application/json",
+      ...authHeaders(t),
+    },
+    credentials: authCreds(t),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`listSaved failed: ${res.status} ${res.statusText} ${text}`);
+  }
+  const data = await res.json();
+  return Array.isArray(data)
+    ? data
+        .map((s) => ({
+          postId: s.postId ?? s.post_id ?? s.id ?? null,
+          createdAt: s.createdAt ?? s.created_at ?? null,
+        }))
+        .filter((x) => !!x.postId)
+    : [];
 }
 
-// 2) 게시물 저장 해제
-export async function unsavePost(postId) {
-  // 서버 명세: /api/v1/saved/{postId} + body {postId}
-  return httpDelete(`/api/v1/saved/${encodeURIComponent(postId)}`, { postId });
+export async function savePost(postId, { token } = {}) {
+  const t = pickToken(token);
+  const res = await fetch(`${API_BASE}/api/v1/saved`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...authHeaders(t),
+    },
+    credentials: authCreds(t),
+    body: JSON.stringify({ postId }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`savePost failed: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json().catch(() => null);
 }
 
-// 3) 저장된 게시물 조회 (id, userId, postId, createdAt 배열)
-export async function listSaved() {
-  return httpGet("/api/v1/saved");
+export async function unsavePost(postId, { token } = {}) {
+  const t = pickToken(token);
+  const res = await fetch(`${API_BASE}/api/v1/saved/${encodeURIComponent(postId)}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      ...authHeaders(t),
+    },
+    credentials: authCreds(t),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`unsavePost failed: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json().catch(() => null);
 }

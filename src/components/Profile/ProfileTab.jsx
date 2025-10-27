@@ -1,3 +1,4 @@
+// src/components/Profile/ProfileTab.jsx
 import React from "react";
 import { BsGrid3X3, BsBookmark, BsSuitHeart } from "react-icons/bs";
 import "../../styles/ProfileTab.css";

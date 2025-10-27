@@ -4,38 +4,16 @@ import FeedPost from "../FeedPosts/FeedPost";
 import { API_BASE } from "../../api/http";
 import { listSaved, unsavePost } from "../../api/saved";
 
+/** 안전한 이미지 url 변환 */
 const toImageUrl = (path) => {
   if (!path) return "";
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
 };
 
-// 단건 게시물 조회 헬퍼
-async function fetchPostById(id, { token } = {}) {
-  const res = await fetch(`${API_BASE}/api/v1/posts/${encodeURIComponent(id)}`, {
-    headers: { Accept: "application/json" },
-    credentials: token ? "omit" : "include",
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`fetchPostById(${id}) failed: ${res.status} ${res.statusText} ${text}`);
-  }
-  return res.json();
-}
-
-function normalizePost(p) {
-  return {
-    postId: p.postId ?? p.id ?? p.post_id ?? null,
-    image: p.image ?? p.imageUrl ?? p.img ?? null,
-    userId: p.userId ?? p.username ?? p.author ?? null,
-    content: p.content ?? p.body ?? "",
-    createdAt: p.createdAt ?? p.created_at ?? p.createdDate ?? null,
-    likes: p.likes ?? p.likeCount ?? 0,
-    comments: p.comments ?? p.commentCount ?? 0,
-  };
-}
-
+/** SavedPosts 컴포넌트 */
 function SavedPosts({ token } = {}) {
-  const [posts, setPosts] = useState([]);
+  const [savedItems, setSavedItems] = useState([]); // 원본 saved list
+  const [posts, setPosts] = useState([]); // normalized post objects
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
@@ -46,20 +24,38 @@ function SavedPosts({ token } = {}) {
       setLoading(true);
       setErr(null);
       try {
-        // 1) 저장 목록(postId들) 조회
-        const saved = await listSaved({ token }); // [{postId, createdAt}]
-        const ids = (saved || []).map((s) => s.postId).filter(Boolean);
+        const saved = await listSaved({ token });
+        if (cancelled) return;
+        setSavedItems(saved || []);
 
-        // 2) 병렬로 게시물 상세 조회
-        const results = await Promise.allSettled(
-          ids.map((id) => fetchPostById(id, { token }))
-        );
+        // normalize saved -> posts
+        const normalized = await Promise.all((saved || []).map(async (s) => {
+          // 1) if wrapper contains full post object
+          if (s.post) return normalizePost(s.post);
+          // 2) if saved item itself looks like a post
+          if (s.id || s.postId || s.content || s.image) return normalizePost(s);
+          // 3) if only postId available -> fetch single post
+          const id = s.postId ?? s.post_id ?? s.id ?? null;
+          if (id) {
+            try {
+              const r = await fetch(`${API_BASE}/api/v1/saved/${encodeURIComponent(id)}`, {
+                headers: { Accept: "application/json" },
+                credentials: token ? "omit" : "include",
+              });
+              if (!r.ok) return null;
+              const data = await r.json();
+              return normalizePost(data);
+            } catch (e) {
+              console.warn("Failed to fetch post for saved id", id, e);
+              return null;
+            }
+          }
+          return null;
+        }));
 
-        const normalized = results
-          .filter((r) => r.status === "fulfilled" && r.value)
-          .map((r) => normalizePost(r.value));
-
-        if (!cancelled) setPosts(normalized);
+        if (!cancelled) {
+          setPosts(normalized.filter(Boolean));
+        }
       } catch (e) {
         console.error("SavedPosts load error:", e);
         if (!cancelled) setErr(e.message || "Failed to load saved posts");
@@ -74,6 +70,18 @@ function SavedPosts({ token } = {}) {
     };
   }, [token]);
 
+  function normalizePost(p) {
+    return {
+      postId: p.postId ?? p.id ?? p.post_id ?? null,
+      image: p.image ?? p.imageUrl ?? p.img ?? null,
+      userId: p.userId ?? p.username ?? p.author ?? null,
+      content: p.content ?? p.body ?? "",
+      createdAt: p.createdAt ?? p.created_at ?? p.createdDate ?? null,
+      likes: p.likes ?? p.likeCount ?? 0,
+      comments: p.comments ?? p.commentCount ?? 0,
+    };
+  }
+
   const postsSorted = useMemo(() => {
     return [...posts].sort((a, b) => {
       const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -83,8 +91,9 @@ function SavedPosts({ token } = {}) {
   }, [posts]);
 
   const handleUnsave = async (postId) => {
+    // optimistic UI: remove immediately
     const prev = posts;
-    setPosts((p) => p.filter((x) => x.postId !== postId)); // optimistic
+    setPosts((p) => p.filter((x) => x.postId !== postId));
     try {
       await unsavePost(postId, { token });
     } catch (e) {
@@ -111,8 +120,7 @@ function SavedPosts({ token } = {}) {
           initialLikes={p.likes}
           commentCount={p.comments}
           isSaved={true}
-          // FeedPost가 (next:boolean) 을 넘겨주므로, 저장 해제(next=false)일 때만 호출
-          onToggleSave={(next) => { if (!next) handleUnsave(p.postId); }}
+          onToggleSave={() => handleUnsave(p.postId)}
         />
       ))}
     </div>
