@@ -1,29 +1,26 @@
-import React from 'react'
-import { WrapItem,Avatar,Box,Flex, Text } from '@chakra-ui/react'
+// src/components/FeedPosts/FeedHeader.jsx
+import React from "react";
+import "../../styles/FeedHeader.css";
 
-function FeedHeader({username,avatar}) {
+function FeedHeader({ username, avatar, subtitle }) {
   return (
-    <Flex mb={3} justifyContent={'space-between'} alignItems={'center'} w={'full'}>
-        <Flex alignItems={'center'}  gap={2}>
-            <Avatar src={avatar} size={'sm'}/>
-            <Flex fontSize={12} fontWeight={"bold"} gap={2}>
-                {username}
-            </Flex>
-        </Flex>
-        <Box cursor={"pointer"}>
-            <Text
-            fontSize={12}
-            color={"blue.500"}
-            fontWeight={'bold'}
-            _hover={{
-                color:'white',
-            }}
-            transition={'0.2s ease-in-out'}>
-                Unfollow
-            </Text>
-        </Box>
-    </Flex>
-  )
+    <div className="feed-header">
+      <div className="feed-header-left">
+        <img
+          src={avatar}
+          alt={username}
+          className="feed-avatar"
+          onError={(e) => (e.currentTarget.src = "/fallbacks/avatar_default.png")}
+        />
+        <div className="feed-name-wrap">
+          <span className="feed-username">{username}</span>
+          {subtitle && <span className="feed-subtitle">{subtitle}</span>}
+        </div>
+      </div>
+
+      <button className="unfollow-btn">Unfollow</button>
+    </div>
+  );
 }
 
-export default FeedHeader
+export default FeedHeader;

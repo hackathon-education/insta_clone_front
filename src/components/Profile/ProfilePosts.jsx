@@ -1,20 +1,16 @@
-import React from 'react'
-import { Grid } from '@chakra-ui/react'
-import ProfilePost from './ProfilePost'
+import React from "react";
+import ProfilePost from "./ProfilePost";
+import "../../styles/ProfilePosts.css";
 
-
-function ProfilePosts({img}) {
+function ProfilePosts() {
   return (
-    <> 
-    <Grid templateColumns={'repeat(3,1fr)'} gap={1} columnGap={1} >
-        <ProfilePost img='/img1.png'/>
-        <ProfilePost img='/img2.png'/>
-        <ProfilePost img='/img3.png'/>
-        <ProfilePost img='/auth.png'/>
-    </Grid>
-    
-    </>
-  )
+    <div className="profile-posts-grid">
+      <ProfilePost img="/img1.png" />
+      <ProfilePost img="/img2.png" />
+      <ProfilePost img="/img3.png" />
+      <ProfilePost img="/auth.png" />
+    </div>
+  );
 }
 
-export default ProfilePosts
+export default ProfilePosts;

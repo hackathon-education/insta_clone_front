@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  VStack,
-  Image,
-  Flex,
-  Text,
-  Stack,
-  Alert,
-  AlertIcon,
-} from "@chakra-ui/react";
 import Signup from "./Signup";
 import Login from "./Login";
 import GoogleAuth from "./GoogleAuth";
-import "./AuthForm.css";
+import "../../styles/AuthForm.css";
 
 function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,43 +13,32 @@ function AuthForm() {
     const signupSuccess = localStorage.getItem("signupSuccess");
     if (signupSuccess) {
       setSuccessMessage(signupSuccess);
-      setIsLogin(true); // 로그인 폼으로 전환
-      localStorage.removeItem("signupSuccess"); // 메시지 제거
+      setIsLogin(true);
+      localStorage.removeItem("signupSuccess");
 
-      // 3초 후 메시지 제거
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 5000);
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
     }
   }, []);
 
-  // 회원가입 성공 시 호출될 함수
   const handleSignupSuccess = (message) => {
     setSuccessMessage(message);
-    setIsLogin(true); // 로그인 폼으로 전환
-
-    // 5초 후 메시지 제거
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 5000);
-  };
-
-  // Signup 컴포넌트에 전달할 props
-  const signupProps = {
-    onSignupSuccess: handleSignupSuccess,
+    setIsLogin(true);
+    const timer = setTimeout(() => setSuccessMessage(""), 5000);
+    return () => clearTimeout(timer);
   };
 
   return (
-    <Stack className="auth-form-stack">
-      <Box className="auth-main-box">
-        <VStack className="auth-vstack">
-          <Image src="/logo.png" className="auth-logo" />
+    <div className="auth-form-stack">
+      <div className="auth-main-box">
+        <div className="auth-vstack">
+          <img src="/logo.png" alt="logo" className="auth-logo" />
 
           {successMessage && (
-            <Alert status="success" mb={4}>
-              <AlertIcon />
-              {successMessage}
-            </Alert>
+            <div className="auth-alert success" role="alert">
+              <span className="auth-alert-icon">✓</span>
+              <span>{successMessage}</span>
+            </div>
           )}
 
           {isLogin ? (
@@ -69,30 +47,31 @@ function AuthForm() {
             <Signup onSignupSuccess={handleSignupSuccess} />
           )}
 
-          <Flex className="auth-divider-container">
-            <Box className="auth-divider-line" />
-            <Text className="auth-divider-text">OR</Text>
-            <Box className="auth-divider-line" />
-          </Flex>
+          <div className="auth-divider-container">
+            <div className="auth-divider-line" />
+            <span className="auth-divider-text">OR</span>
+            <div className="auth-divider-line" />
+          </div>
 
           <GoogleAuth />
-        </VStack>
-      </Box>
+        </div>
+      </div>
 
-      <Box className="auth-bottom-box">
-        <Flex className="auth-bottom-flex">
-          <Box className="auth-bottom-text">
+      <div className="auth-bottom-box">
+        <div className="auth-bottom-flex">
+          <div className="auth-bottom-text">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-          </Box>
-          <Box
+          </div>
+          <button
+            type="button"
             onClick={() => setIsLogin(!isLogin)}
             className="auth-bottom-link"
           >
             {isLogin ? "Sign Up" : "Log in"}
-          </Box>
-        </Flex>
-      </Box>
-    </Stack>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

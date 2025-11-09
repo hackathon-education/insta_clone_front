@@ -1,36 +1,26 @@
-import { Flex, Text, Box } from '@chakra-ui/react'
-import {BsGrid3X3,BsBookmark,BsSuitHeart} from 'react-icons/bs'
-import React from 'react'
+// src/components/Profile/ProfileTab.jsx
+import React from "react";
+import { BsGrid3X3, BsBookmark, BsSuitHeart } from "react-icons/bs";
+import "../../styles/ProfileTab.css";
 
-function ProfileTab() {
+function ProfileTab({ current = "posts", onChange }) {
+  const Tab = ({ id, icon, text }) => (
+    <button
+      className={`tab-item ${current === id ? "active" : ""}`}
+      onClick={() => onChange?.(id)}
+    >
+      <span className="tab-icon">{icon}</span>
+      <span className="tab-text">{text}</span>
+    </button>
+  );
+
   return (
-    <Flex w={'full'} justifyContent={'center'} gap={10} textTransform={'uppercase'} fontWeight={'bold'} mt={2} mb={2}>
-      <Flex alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-          <BsGrid3X3/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Posts
-        </Text>
-      </Flex>  
-      <Flex alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-           <BsBookmark/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Saved
-        </Text>
-      </Flex>  
-      <Flex  alignItems={'center'} pd='3' gap={1} cursor={'pointer'}>
-        <Box fontSize={20}>
-          <BsSuitHeart fontWeight={'bold'}/>
-        </Box>
-        <Text fontSize={12} display={'block'}>
-          Likes
-        </Text>
-      </Flex>  
-    </Flex>
-  )
+    <div className="profile-tab">
+      <Tab id="posts" icon={<BsGrid3X3 />} text="Posts" />
+      <Tab id="saved" icon={<BsBookmark />} text="Saved" />
+      <Tab id="likes" icon={<BsSuitHeart />} text="Likes" />
+    </div>
+  );
 }
 
-export default ProfileTab
+export default ProfileTab;

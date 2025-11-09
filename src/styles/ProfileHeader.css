@@ -1,0 +1,90 @@
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 40px 0;
+}
+
+@media (min-width: 640px) {
+  .profile-header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2.5rem;
+  }
+}
+
+/* 아바타 */
+.profile-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+@media (min-width: 768px) {
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* 정보 박스 */
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+/* 상단 유저명 + 버튼 */
+.profile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+@media (min-width: 640px) {
+  .profile-row {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+}
+.profile-username {
+  font-size: 18px;
+  font-weight: 600;
+}
+.edit-profile-btn {
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.edit-profile-btn:hover {
+  background: #f5f5f5;
+}
+
+/* 통계 */
+.profile-stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 14px;
+}
+.profile-stats b {
+  margin-right: 4px;
+}
+
+/* 소개 */
+.profile-bio {
+  font-size: 14px;
+  font-weight: 600;
+}

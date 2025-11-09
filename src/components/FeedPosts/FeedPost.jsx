@@ -1,51 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import { Box, Image, Skeleton, SkeletonCircle, VStack,Container,Flex } from '@chakra-ui/react'
-import FeedHeader from './FeedHeader'
-import FeedFooter from './FeedFooter'
+import React, { useState } from "react";
+import { BsSuitHeart, BsSuitHeartFill, BsBookmark } from "react-icons/bs";
+import "../../styles/FeedPost.css";
 
+export default function FeedPost({
+  img,
+  username,
+  avatar,
+  content,
+  createdAt,
+  initialLikes,
+  commentCount,
+  isSaved = false,
+  onToggleSave, // (nextBool) => void
+}) {
+  const [saved, setSaved] = useState(isSaved);
+  const [busy, setBusy] = useState(false);
 
-function FeedPost({img,username,avatar}) {
-  const[isLoading,setLoading] = useState(true);
-    useEffect(()=>
-    {
-      setTimeout(() => {
-        setLoading(false)
-      }, 2000);
-    },[])
- 
+  const handleClickSave = async () => {
+    if (!onToggleSave || busy) return;
+    const next = !saved;
+    setSaved(next);       // UI 즉시 반영
+    setBusy(true);
+    try {
+      await onToggleSave(next);
+    } catch {
+      setSaved(!next);    // 실패 시 되돌림 (여기선 부모에서 이미 처리해서 보통 안옴)
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
-    <Container maxW={"container.sm"}  px={2} >
-      {/* {isLoading && [0,1,2,3].map((_,idx) =>
-        {
-          <VStack key={idx} gap={4} alignItems={'flex-start'} mb={10}>
-            <Flex gap="2">
-              <SkeletonCircle size={10}/>
-              <VStack gap={2} alignItems={'flex-start'}>
-                <Skeleton height={'10px'} w={'200px'}/>
-                <Skeleton height={'10px'} w={'200px'}/>
-              </VStack>
-            </Flex>
-            <Skeleton w={'full'}>
-              <Box h={'500px'}>
-                CONTENTS WRAPPED
-              </Box>
-            </Skeleton>
-          </VStack>
-        }
-      )} */}
-      {/* {!isLoading && ( */}
-        
-        <FeedHeader username={username}  avatar={avatar}/>
-         <Box overflow={'hidden'} borderRadius={4} my={2}>
-          <Image src={img} w={'300px'}></Image>
-        </Box>
-        <FeedFooter/>
-      
-      {/* )} */}
-    
-    </Container>
-    
-  )
-}
+    <div className="feedpost-container">
+      <div className="feedpost-header">
+        <img className="feedpost-avatar" src={avatar} alt={username} />
+        <div className="feedpost-user">
+          <div className="user-name">{username}</div>
+          <div className="post-date">
+            {new Date(createdAt).toLocaleString()}
+          </div>
+        </div>
+      </div>
 
-export default FeedPost
+      <div className="feedpost-image-wrap">
+        <img className="feedpost-image" src={img} alt={content?.slice(0, 20)} />
+      </div>
+
+      <div className="feedpost-actions">
+        <button
+          className={`heart-btn ${saved ? "on" : ""}`}
+          onClick={handleClickSave}
+          disabled={busy}
+          title={saved ? "저장 해제" : "저장"}
+        >
+          {saved ? <BsSuitHeartFill /> : <BsSuitHeart />}
+        </button>
+
+        {/* (옵션) 저장됨 표시 */}
+        {saved && <span className="saved-chip"><BsBookmark /> Saved</span>}
+      </div>
+
+      <div className="feedpost-content">
+        <p>{content}</p>
+        <div className="meta">
+          <span>좋아요 {initialLikes ?? 0}</span>
+          <span>댓글 {commentCount ?? 0}</span>
+        </div>
+      </div>
+    </div>
+  );
+}

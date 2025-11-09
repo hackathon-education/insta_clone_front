@@ -1,13 +1,12 @@
 import React from "react";
-import { Flex, Image, Text } from "@chakra-ui/react";
-import "./AuthForm.css";
+import "../../styles/AuthForm.css";
 
 function GoogleAuth() {
   return (
-    <Flex className="google-auth-container">
-      <Image src="/google.png" className="google-auth-icon" />
-      <Text className="google-auth-text">Login with Google</Text>
-    </Flex>
+    <div className="google-auth-container">
+      <img src="/google.png" alt="Google logo" className="google-auth-icon" />
+      <span className="google-auth-text">Login with Google</span>
+    </div>
   );
 }
 

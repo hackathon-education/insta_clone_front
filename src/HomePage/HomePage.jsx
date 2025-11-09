@@ -1,21 +1,21 @@
-import React from 'react'
-import{Box, Container, Flex} from '@chakra-ui/react'
-import FeedPsots from '../components/FeedPosts/FeedPsots'
-import SuggestionPosts from '../components/SuggestionFeed/SuggestionPosts'
+import React from "react";
+import FeedPosts from "../components/FeedPosts/FeedPosts";
+import SuggestionPosts from "../components/SuggestionFeed/SuggestionPosts";
+import "../styles/HomePage.css";
 
 function HomePage() {
   return (
-    <Container maxW={"container.lg"}>
-        <Flex gap={20}>
-            <Box flex={2} ml={300} maxW={'300px'} >
-              <FeedPsots/>
-            </Box>
-            <Box flex={3} mr={20}  maxW={"300px"} display={{base:"none",lg:"block"}}>
-            <SuggestionPosts/>
-            </Box>
-        </Flex>
-    </Container>
-  )
+    <div className="homepage">
+      <div className="homepage-main">
+        <div className="homepage-feed">
+          <FeedPosts />
+        </div>
+        <div className="homepage-suggestions">
+          <SuggestionPosts />
+        </div>
+      </div>
+    </div>
+  );
 }
 
-export default HomePage
+export default HomePage;

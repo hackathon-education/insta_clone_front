@@ -1,57 +1,44 @@
-import { Box, Button, Flex,Input,InputGroup,InputRightElement,Text } from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { CommentLogo, NotificationsLogo,UnlikeLogo } from '../../assests/logos';
+// src/components/FeedPosts/FeedFooter.jsx
+import React, { useState } from "react";
+import { CommentLogo, NotificationsLogo, UnlikeLogo } from "../../assests/logos";
+import "../../styles/FeedFooter.css";
 
-function FeedFooter() {
-  const[liked,setLiked] = useState(false);
-  const[likes,setLikes] =useState(0);
-  
-  const handleLike =()=>
-  {
-    if(liked)
-    {
-      setLiked(flase);
-      setLikes(likes-1);
-    }
-    else
-    {
-      setLiked(true);
-      setLikes(likes+1);
-    }
-  }
+function FeedFooter({ initialLikes = 0, commentCount = 0 }) {
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(initialLikes);
+
+  const handleLike = () => {
+    // 낙관적 업데이트 (원하면 여기서 /api/v1/posts/:id/like POST 붙이면 됨)
+    setLiked((prev) => !prev);
+    setLikes((prev) => (liked ? prev - 1 : prev + 1));
+  };
+
   return (
-    <Box mb={10} mt={'auto'}>
-    <Flex justifyItems={'center'} gap={4} mt={3}>
-      <Box onClick={handleLike} cursor={'pointer'} fontSize={8}>
-        {!liked ? <NotificationsLogo /> : <UnlikeLogo />}
-      </Box>
-      <Box cursor={'pointer'} fontSize={18}>
-        <CommentLogo/>
-      </Box>
-    </Flex>
-    <Text fontSize={'sm'} fontWeight={600}>
-      {likes} likes
-    </Text>
-    <Flex alignItems={'center'} gap={2} justifyContent={'space-between'} w={'full'}>
-      <InputGroup>
-        <Input variant={'flushed'} placeholder ={"Add a comment..."} fontSize={14} />
-        <InputRightElement>
-          <Button
-            fontSize={14}
-            color={'blue'}
-            fontWeight={600}
-            cursor={'pointer'}
-            _hover={{color:'white'}}
-            bg={"transparent"}
-            >
-              Post
-            </Button>
-        </InputRightElement>
-      </InputGroup>
-    </Flex>
-    
-    </Box>
-  )
+    <div className="feed-footer">
+      {/* 아이콘 영역 */}
+      <div className="feed-footer-icons">
+        <button className="icon-button" onClick={handleLike} aria-label="like">
+          {liked ? <UnlikeLogo /> : <NotificationsLogo />}
+        </button>
+        <button className="icon-button" aria-label="comment">
+          <CommentLogo />
+        </button>
+      </div>
+
+      {/* 좋아요/댓글 카운트 */}
+      <p className="likes-text">{likes} likes · {commentCount} comments</p>
+
+      {/* 댓글 입력 영역 */}
+      <div className="comment-box">
+        <input
+          type="text"
+          placeholder="Add a comment..."
+          className="comment-input"
+        />
+        <button className="comment-post-btn">Post</button>
+      </div>
+    </div>
+  );
 }
 
-export default FeedFooter
+export default FeedFooter;
