@@ -10,9 +10,6 @@ function HomePage() {
         <div className="homepage-feed">
           <FeedPosts />
         </div>
-        <div className="homepage-suggestions">
-          <SuggestionPosts />
-        </div>
       </div>
     </div>
   );

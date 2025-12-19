@@ -2,14 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
-import { CreatePostLogo, InstagramLogo, NotificationsLogo, SearchLogo } from "../assests/logos";
+import {
+  CreatePostLogo,
+  InstagramLogo,
+  NotificationsLogo,
+  SearchLogo,
+} from "../assests/logos";
 import "../styles/SideBar.css";
 
 function SideBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [hasToken, setHasToken] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 로그아웃 모달
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  // 잠김 항목 모달
+  const [isLockedModalOpen, setIsLockedModalOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -19,11 +29,11 @@ function SideBar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setHasToken(false);
-    setIsModalOpen(true);
+    setIsLogoutModalOpen(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const handleLogoutModalClose = () => {
+    setIsLogoutModalOpen(false);
     navigate("/");
   };
 
@@ -31,13 +41,28 @@ function SideBar() {
     navigate("/auth");
   };
 
+  const handleLockedClick = (e) => {
+    e.preventDefault();
+    setIsLockedModalOpen(true);
+  };
+
+  const handleLockedModalClose = () => {
+    setIsLockedModalOpen(false);
+  };
+
   const sidebarItems = [
     { icon: <AiFillHome size={25} />, text: "Home", link: "/" },
-    { icon: <SearchLogo />, text: "Search" },
-    { icon: <NotificationsLogo />, text: "Notifications" },
-    { icon: <CreatePostLogo />, text: "Create" },
+    { icon: <SearchLogo />, text: "Search", locked: true },
+    { icon: <NotificationsLogo />, text: "Notifications", locked: true },
+    { icon: <CreatePostLogo />, text: "Create", locked: true },
     {
-      icon: <img src="/profilepic.png" alt="Aditya" className="sidebar-avatar" />,
+      icon: (
+        <img
+          src="/profilepic.png"
+          alt="profile"
+          className="sidebar-avatar"
+        />
+      ),
       text: "Profile",
       link: "/Aditya",
     },
@@ -53,17 +78,40 @@ function SideBar() {
 
         {/* 메뉴 */}
         <div className="sidebar-menu">
-          {sidebarItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.link || "#"}
-              className="sidebar-item"
-              title={item.text}
-            >
-              {item.icon}
-              <span className="sidebar-text">{item.text}</span>
-            </Link>
-          ))}
+          {sidebarItems.map((item, index) => {
+            if (item.locked) {
+              return (
+                <div
+                  key={index}
+                  className="sidebar-item"
+                  onClick={handleLockedClick}
+                  title={item.text}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      setIsLockedModalOpen(true);
+                    }
+                  }}
+                >
+                  {item.icon}
+                  <span className="sidebar-text">{item.text}</span>
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={index}
+                to={item.link || "#"}
+                className="sidebar-item"
+                title={item.text}
+              >
+                {item.icon}
+                <span className="sidebar-text">{item.text}</span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* 로그인/로그아웃 버튼 */}
@@ -71,6 +119,13 @@ function SideBar() {
           className="sidebar-item sidebar-auth"
           onClick={hasToken ? handleLogout : handleLogin}
           title={hasToken ? "Log Out" : "Log In"}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              hasToken ? handleLogout() : handleLogin();
+            }
+          }}
         >
           <BiLogOut size={25} />
           <span className="sidebar-text">{hasToken ? "Log Out" : "Log In"}</span>
@@ -78,15 +133,25 @@ function SideBar() {
       </div>
 
       {/* 로그아웃 모달 */}
-      {isModalOpen && (
-        <div className="modal-backdrop" onClick={handleModalClose}>
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()} // 내부 클릭시 닫히지 않도록
-          >
+      {isLogoutModalOpen && (
+        <div className="modal-backdrop" onClick={handleLogoutModalClose}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-header">로그아웃</h2>
             <p className="modal-body">로그아웃 되었습니다.</p>
-            <button className="modal-btn" onClick={handleModalClose}>
+            <button className="modal-btn" onClick={handleLogoutModalClose}>
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 잠김 항목 모달 */}
+      {isLockedModalOpen && (
+        <div className="modal-backdrop" onClick={handleLockedModalClose}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-header">잠김 항목</h2>
+            <p className="modal-body">해당 기능은 현재 잠겨 있습니다.</p>
+            <button className="modal-btn" onClick={handleLockedModalClose}>
               확인
             </button>
           </div>
